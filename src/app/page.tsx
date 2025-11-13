@@ -151,14 +151,14 @@ export default async function HomePage() {
       <MediaShelf
         title="Now Playing"
         subtitle="Fresh in theaters right now"
-        ctaHref="/movies?category=now-playing"
+        ctaHref="/movies/now-playing"
         items={mapMovies(nowPlayingMovies)}
       />
 
       <MediaShelf
         title="Top Rated Movies"
         subtitle="Critically acclaimed stories worth your time"
-        ctaHref="/movies?category=top-rated"
+        ctaHref="/movies/top-rated"
         items={mapMovies(topRatedMovies)}
       />
 
@@ -172,14 +172,14 @@ export default async function HomePage() {
       <MediaShelf
         title="Top Rated TV"
         subtitle="Fan favorites delivering every season"
-        ctaHref="/tv?category=top-rated"
+        ctaHref="/tv/top-rated"
         items={mapTv(topRatedTvShows)}
       />
 
       <MediaShelf
         title="Upcoming Movies"
         subtitle="Add these to your watchlist before they drop"
-        ctaHref="/movies?category=upcoming"
+        ctaHref="/movies/upcoming"
         items={mapMovies(upcomingMovies)}
       />
 

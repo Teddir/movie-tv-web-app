@@ -1,109 +1,32 @@
 import { Metadata } from "next";
 
 import { loadMoreCatalogueMovies } from "@/app/movies/actions";
-import { getMovieCategory, getMovieGenres } from "@/lib/tmdb";
 import { FilterableMediaGallery } from "@/components/filters/filterable-media-gallery";
+import { getMovieCategory, getMovieGenres } from "@/lib/tmdb";
 import { mapMovieSummary } from "@/lib/mappers";
-import { MovieCategorySection } from "@/app/movies/category-section";
 
 export const metadata: Metadata = {
   title: "Movies",
   description:
-    "Browse top rated, popular, upcoming, and now playing movies curated from TMDB.",
+    "Browse top rated, popular, and upcoming films curated from TMDB.",
 };
 
 export const dynamic = "force-dynamic";
 
-type MoviesPageProps = {
-  searchParams: Promise<{ category?: string | string[] }>;
-};
+export default async function MoviesPage() {
+  const [popular, topRated, upcoming, movieGenres] = await Promise.all([
+    getMovieCategory("popular"),
+    getMovieCategory("top_rated"),
+    getMovieCategory("upcoming"),
+    getMovieGenres(),
+  ]);
 
-const categoryKeys = [
-  "catalogue",
-  "now-playing",
-  "popular",
-  "top-rated",
-  "upcoming",
-] as const;
+  const aggregatedItems = dedupeMediaItems([
+    ...popular.results.map(mapMovieSummary),
+    ...topRated.results.map(mapMovieSummary),
+    ...upcoming.results.map(mapMovieSummary),
+  ]);
 
-const categoryCopy: Record<
-  (typeof categoryKeys)[number],
-  { title: string; description: string }
-> = {
-  catalogue: {
-    title: "Browse Catalogue",
-    description:
-      "Use the filters on the left to refine movies by release date, genre, and sort order.",
-  },
-  "now-playing": {
-    title: "Now Playing",
-    description: "In theaters and ready for the big screen experience.",
-  },
-  popular: {
-    title: "Popular",
-    description: "Currently captivating audiences worldwide.",
-  },
-  "top-rated": {
-    title: "Top Rated",
-    description: "Critical darlings and community favorites.",
-  },
-  upcoming: {
-    title: "Upcoming",
-    description: "Save these titles before they hit theaters.",
-  },
-};
-
-export default async function MoviesPage({ searchParams }: MoviesPageProps) {
-  const [{ category }] = await Promise.all([searchParams]);
-  const categoryParam = Array.isArray(category) ? category[0] : category;
-  const activeCategory = categoryKeys.includes(
-    (categoryParam ?? "catalogue") as (typeof categoryKeys)[number],
-  )
-    ? ((categoryParam ?? "catalogue") as (typeof categoryKeys)[number])
-    : "catalogue";
-
-  const [nowPlaying, popular, topRated, upcoming, movieGenres] =
-    await Promise.all([
-      getMovieCategory("now_playing"),
-      getMovieCategory("popular"),
-      getMovieCategory("top_rated"),
-      getMovieCategory("upcoming"),
-      getMovieGenres(),
-    ]);
-
-  const transform = (collection: Awaited<ReturnType<typeof getMovieCategory>>) =>
-    collection.results.map((movie) => mapMovieSummary(movie));
-
-  const collections = {
-    "now-playing": transform(nowPlaying),
-    popular: transform(popular),
-    "top-rated": transform(topRated),
-    upcoming: transform(upcoming),
-  } as const;
-  const totals = {
-    "now-playing": nowPlaying.total_pages,
-    popular: popular.total_pages,
-    "top-rated": topRated.total_pages,
-    upcoming: upcoming.total_pages,
-  } as const;
-
-  const aggregatedItems = Array.from(
-    new Map(
-      [
-        ...collections["now-playing"],
-        ...collections.popular,
-        ...collections["top-rated"],
-        ...collections.upcoming,
-      ].map((item) => [item.id, item]),
-    ).values(),
-  );
-
-  const isCatalogue = activeCategory === "catalogue";
-  const apiCategory = isCatalogue
-    ? null
-    : (activeCategory as Exclude<(typeof categoryKeys)[number], "catalogue">);
-  const initialCategoryItems = apiCategory ? collections[apiCategory] : [];
-  const hasMore = apiCategory ? totals[apiCategory] > 1 : false;
   const catalogueHasMore = popular.total_pages > 1;
 
   return (
@@ -118,26 +41,24 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
         </p>
       </header>
 
-      {isCatalogue ? (
-        <FilterableMediaGallery
-          title={categoryCopy.catalogue.title}
-          description={categoryCopy.catalogue.description}
-          genres={movieGenres?.genres ?? []}
-          initialItems={aggregatedItems}
-          mediaType="movie"
-          initialHasMore={catalogueHasMore}
-          loadMore={loadMoreCatalogueMovies}
-        />
-      ) : (
-        <MovieCategorySection
-          title={categoryCopy[activeCategory].title}
-          description={categoryCopy[activeCategory].description}
-          initialItems={initialCategoryItems}
-          category={apiCategory}
-          hasMore={hasMore}
-        />
-      )}
+      <FilterableMediaGallery
+        title="Browse Catalogue"
+        description="Use the filters on the left to refine movies by release date, genre, and sort order."
+        genres={movieGenres?.genres ?? []}
+        initialItems={aggregatedItems}
+        mediaType="movie"
+        initialHasMore={catalogueHasMore}
+        loadMore={loadMoreCatalogueMovies}
+      />
     </div>
   );
+}
+
+function dedupeMediaItems(items: ReturnType<typeof mapMovieSummary>[]) {
+  const map = new Map<number, ReturnType<typeof mapMovieSummary>>();
+  items.forEach((item) => {
+    map.set(item.id, item);
+  });
+  return Array.from(map.values());
 }
 

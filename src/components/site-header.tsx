@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FilmIcon } from "lucide-react";
 
@@ -17,28 +17,44 @@ const navItems = [
 
 const movieSubNav = [
   { href: "/movies", label: "Catalogue", value: "catalogue" },
-  { href: "/movies?category=now-playing", label: "Now Playing", value: "now-playing" },
-  { href: "/movies?category=popular", label: "Popular", value: "popular" },
-  { href: "/movies?category=top-rated", label: "Top Rated", value: "top-rated" },
-  { href: "/movies?category=upcoming", label: "Upcoming", value: "upcoming" },
+  { href: "/movies/now-playing", label: "Now Playing", value: "now-playing" },
+  { href: "/movies/popular", label: "Popular", value: "popular" },
+  { href: "/movies/top-rated", label: "Top Rated", value: "top-rated" },
+  { href: "/movies/upcoming", label: "Upcoming", value: "upcoming" },
 ] as const;
 
 const tvSubNav = [
   { href: "/tv", label: "Catalogue", value: "catalogue" },
-  { href: "/tv?category=airing-today", label: "Airing Today", value: "airing-today" },
-  { href: "/tv?category=on-the-air", label: "On The Air", value: "on-the-air" },
-  { href: "/tv?category=popular", label: "Popular", value: "popular" },
-  { href: "/tv?category=top-rated", label: "Top Rated", value: "top-rated" },
+  { href: "/tv/airing-today", label: "Airing Today", value: "airing-today" },
+  { href: "/tv/on-the-air", label: "On The Air", value: "on-the-air" },
+  { href: "/tv/popular", label: "Popular", value: "popular" },
+  { href: "/tv/top-rated", label: "Top Rated", value: "top-rated" },
 ] as const;
+
+function getMovieNavValue(pathname: string) {
+  if (pathname === "/movies") return "catalogue";
+  if (pathname.startsWith("/movies/now-playing")) return "now-playing";
+  if (pathname.startsWith("/movies/popular")) return "popular";
+  if (pathname.startsWith("/movies/top-rated")) return "top-rated";
+  if (pathname.startsWith("/movies/upcoming")) return "upcoming";
+  return null;
+}
+
+function getTvNavValue(pathname: string) {
+  if (pathname === "/tv") return "catalogue";
+  if (pathname.startsWith("/tv/airing-today")) return "airing-today";
+  if (pathname.startsWith("/tv/on-the-air")) return "on-the-air";
+  if (pathname.startsWith("/tv/popular")) return "popular";
+  if (pathname.startsWith("/tv/top-rated")) return "top-rated";
+  return null;
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const categoryQuery = searchParams?.get("category");
   const movieCategory = pathname.startsWith("/movies")
-    ? categoryQuery ?? "catalogue"
+    ? getMovieNavValue(pathname)
     : null;
-  const tvCategory = pathname.startsWith("/tv") ? categoryQuery ?? "catalogue" : null;
+  const tvCategory = pathname.startsWith("/tv") ? getTvNavValue(pathname) : null;
   const isMoviesRoute = pathname.startsWith("/movies");
   const isTvRoute = pathname.startsWith("/tv");
   const [hidden, setHidden] = useState(false);
@@ -114,7 +130,7 @@ export function SiteHeader() {
             className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-2 py-2"
           >
             {movieSubNav.map((item) => {
-              const isActive = (movieCategory ?? "catalogue") === item.value;
+            const isActive = movieCategory === item.value;
               return (
                 <Link
                   key={item.href}
@@ -137,7 +153,7 @@ export function SiteHeader() {
             className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-2 py-2"
           >
             {tvSubNav.map((item) => {
-              const isActive = (tvCategory ?? "catalogue") === item.value;
+            const isActive = tvCategory === item.value;
               return (
                 <Link
                   key={item.href}

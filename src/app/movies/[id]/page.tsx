@@ -1,0 +1,219 @@
+import Image from "next/image";
+import Link from "next/link";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import {
+  getBackdropUrl,
+  getImageUrl,
+  getMovieDetails,
+  getProfileUrl,
+} from "@/lib/tmdb";
+import { formatDate, formatRuntime, formatScore } from "@/lib/utils";
+import { MediaInteractions } from "@/components/media-interactions";
+import { MediaShelf } from "@/components/sections/media-shelf";
+import { TrailerDialog } from "@/components/trailer-dialog";
+import { Badge } from "@/components/ui/badge";
+
+interface MovieDetailPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: MovieDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
+  if (!movie) {
+    return {
+      title: "Movie not found",
+    };
+  }
+
+  return {
+    title: movie.title,
+    description: movie.overview,
+    openGraph: {
+      title: movie.title,
+      description: movie.overview,
+      images: movie.backdrop_path
+        ? [getBackdropUrl(movie.backdrop_path, "w780") ?? ""]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: movie.title,
+      description: movie.overview,
+    },
+  };
+}
+
+export default async function MovieDetailPage({ params }: MovieDetailPageProps) {
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
+  if (!movie) {
+    notFound();
+  }
+
+  const posterUrl = getImageUrl(movie.poster_path, "w500");
+  const backdropUrl = getBackdropUrl(movie.backdrop_path, "w780");
+  const releaseDate = formatDate(movie.release_date);
+  const runtime = formatRuntime(movie.runtime);
+  const genres = movie.genres.map((genre) => genre.name).join(" • ");
+  const topCast = movie.credits?.cast?.slice(0, 8) ?? [];
+  const recommendations = movie.recommendations?.results?.slice(0, 12) ?? [];
+
+  return (
+    <div className="space-y-16">
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
+        {backdropUrl ? (
+          <Image
+            src={backdropUrl}
+            alt={`${movie.title} backdrop`}
+            fill
+            priority
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            sizes="(max-width: 768px) 100vw, 90vw"
+          />
+        ) : null}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-black/85 via-black/70 to-black/85" />
+        <div className="flex flex-col gap-10 p-8 md:flex-row md:gap-12 md:p-12">
+          <div className="mx-auto w-48 shrink-0 md:mx-0 lg:w-60">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
+              {posterUrl ? (
+                <Image
+                  src={posterUrl}
+                  alt={`${movie.title} poster`}
+                  fill
+                  sizes="240px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground">
+                  No poster
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex w-full flex-col gap-6 text-white">
+            <div className="space-y-4">
+              <Badge className="bg-primary text-primary-foreground">
+                {movie.status}
+              </Badge>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl text-primary">
+                {movie.title}
+              </h1>
+              {movie.tagline ? (
+                <p className="text-lg italic text-muted-foreground">{movie.tagline}</p>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              {releaseDate ? <span>{releaseDate}</span> : null}
+              {runtime ? <span>{runtime}</span> : null}
+              {genres ? <span>{genres}</span> : null}
+              <span>TMDB {formatScore(movie.vote_average)}</span>
+            </div>
+            <p className="max-w-3xl text-base text-muted-foreground/90">
+              {movie.overview || "No synopsis provided yet."}
+            </p>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              <MediaInteractions
+                id={movie.id}
+                mediaType="movie"
+                title={movie.title}
+                releaseDate={movie.release_date}
+                posterUrl={posterUrl}
+                score={movie.vote_average}
+                layout="inline"
+              />
+              <TrailerDialog videos={movie.videos?.results} title={movie.title} />
+            </div>
+            {movie.homepage ? (
+              <div>
+                <Link
+                  href={movie.homepage}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Official website
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      {topCast.length ? (
+        <section className="space-y-4" aria-labelledby="top-cast-heading">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 id="top-cast-heading" className="text-2xl font-semibold text-foreground">
+                Top Billed Cast
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Familiar faces bringing {movie.title} to life.
+              </p>
+            </div>
+            <Link
+              href={`https://www.themoviedb.org/movie/${movie.id}/cast`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Full cast & crew
+            </Link>
+          </div>
+          <div className="scrollbar-thin flex gap-5 overflow-x-auto pb-2">
+            {topCast.map((member) => (
+              <article
+                key={member.id}
+                className="w-48 shrink-0 space-y-2 rounded-2xl border border-border/60 bg-card/70 p-4 text-center"
+              >
+                <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-2xl border border-border/60 bg-muted">
+                  {member.profile_path ? (
+                    <Image
+                      src={getProfileUrl(member.profile_path, "w185") ?? ""}
+                      alt={member.name}
+                      fill
+                      sizes="144px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                      No image
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-foreground">{member.name}</p>
+                  <p className="text-xs text-muted-foreground">{member.character}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {recommendations.length ? (
+        <MediaShelf
+          title="You Might Also Like"
+          subtitle="Recommendations powered by TMDB"
+          items={recommendations.map((rec) => ({
+            id: rec.id,
+            title: rec.title,
+            mediaType: "movie" as const,
+            overview: rec.overview,
+            posterUrl: getImageUrl(rec.poster_path, "w500"),
+            score: rec.vote_average,
+            releaseDate: rec.release_date,
+            href: `/movies/${rec.id}`,
+          }))}
+        />
+      ) : null}
+    </div>
+  );
+}
+

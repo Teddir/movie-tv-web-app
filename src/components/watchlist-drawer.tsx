@@ -72,17 +72,17 @@ export function WatchlistDrawer() {
             items.map((item) => (
               <article
                 key={`${item.mediaType}-${item.id}`}
-                className="group rounded-2xl border border-border/60 bg-card/70 p-4 transition hover:border-border hover:bg-card"
+                className="group rounded-2xl border border-border/60 bg-card/70 p-3 transition hover:border-border hover:bg-card sm:p-4"
               >
-                <div className="flex flex-row gap-4">
-                  <div className="relative h-28 w-20 overflow-hidden rounded-xl border border-border/50 bg-muted/60">
+                <div className="flex flex-col gap-4 sm:flex-row">
+                  <div className="relative aspect-2/3 w-full overflow-hidden rounded-xl border border-border/50 bg-muted/60 sm:h-28 sm:w-20 sm:flex-none sm:rounded-lg">
                     {item.image ? (
                       <Image
                         src={item.image}
                         alt={`${item.title} poster`}
                         fill
-                        sizes="80px"
-                        className="object-cover w-28 h-28 transition duration-500 group-hover:scale-[1.03]"
+                        sizes="(max-width: 640px) 160px, 80px"
+                        className="object-cover transition duration-500 group-hover:scale-[1.03]"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
@@ -90,19 +90,19 @@ export function WatchlistDrawer() {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-1 flex-col justify-between">
-                    <header>
+                  <div className="flex flex-1 flex-col justify-between gap-3">
+                    <header className="space-y-1">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground">
                         {item.mediaType === "movie" ? "Movie" : "TV Series"}
                       </p>
-                      <h3 className="text-lg font-semibold text-foreground">
+                      <h3 className="text-base font-semibold text-foreground sm:text-lg">
                         {item.title}
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         {item.subtitle ?? (item.releaseDate ? formatDate(item.releaseDate) : "Date TBA")}
                       </p>
                     </header>
-                    <div className="mt-3 flex items-center justify-between text-sm">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                       <span className="flex items-center gap-1 text-muted-foreground">
                         <StarIcon className="h-4 w-4 text-primary" aria-hidden="true" />
                         {(() => {
@@ -114,11 +114,11 @@ export function WatchlistDrawer() {
                         TMDB {item.averageScore ? formatScore(item.averageScore) : "NR"}
                       </span>
                     </div>
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center">
                       <Button
                         variant="default"
                         size="sm"
-                        className="gap-2"
+                        className="w-full gap-2 sm:w-auto"
                         asChild
                       >
                         <Link href={`/${item.mediaType === "movie" ? "movies" : "tv"}/${item.id}`}>
@@ -127,27 +127,13 @@ export function WatchlistDrawer() {
                         </Link>
                       </Button>
                       <Button
-                        variant="secondary"
-                        size="sm"
-                        className="gap-2"
-                        asChild
-                      >
-                        <Link
-                          href={`https://www.themoviedb.org/${item.mediaType}/${item.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <PlayIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                        </Link>
-                      </Button>
-                      <Button
                         variant="ghost"
                         size="sm"
-                        className="gap-2 text-destructive"
+                        className="w-full gap-2 sm:w-auto text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => removeFromWatchlist(item.id, item.mediaType)}
                       >
-                        <TrashIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                        Remove
+                          <TrashIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                          Remove
                       </Button>
                     </div>
                   </div>

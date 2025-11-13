@@ -53,6 +53,8 @@ const SheetContent = React.forwardRef<
       )}
       {...props}
     >
+      <DialogPrimitive.Title className="sr-only"></DialogPrimitive.Title>
+      
       {children}
       <SheetClose className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <XIcon className="h-4 w-4" />

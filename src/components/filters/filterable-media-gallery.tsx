@@ -1,12 +1,33 @@
- "use client";
+"use client";
 
-import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  startTransition,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
+import { FilterIcon } from "lucide-react";
 
 import type { Genre } from "@/lib/tmdb";
 import type { FilterableMediaItem } from "@/types/media";
 import { cn } from "@/lib/utils";
 import { MediaCard } from "@/components/media-card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 type SortOption = (typeof sortOptions)[number]["value"];
 type ReleaseOption = (typeof releaseFilters)[number]["value"];
@@ -74,6 +95,7 @@ export function FilterableMediaGallery({
   const [allItems, setAllItems] = useState<FilterableMediaItem[]>(initialItems);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isPending, startLoadMoreTransition] = useTransition();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     startTransition(() => {
@@ -90,17 +112,17 @@ export function FilterableMediaGallery({
       setSelectedGenres(presetGenres);
     });
   }, [presetSort, presetRelease, presetGenresKey, presetGenres]);
-  const toggleGenre = (id: number) => {
+  const toggleGenre = useCallback((id: number) => {
     setSelectedGenres((prev) =>
       prev.includes(id) ? prev.filter((genreId) => genreId !== id) : [...prev, id],
     );
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSort("popularity");
     setRelease("all");
     setSelectedGenres([]);
-  };
+  }, []);
 
   const filteredItems = useMemo(() => {
     const filtered = allItems.filter((item) => {
@@ -138,6 +160,29 @@ export function FilterableMediaGallery({
     return filtered.sort((a, b) => compareItems(a, b, sort));
   }, [allItems, release, selectedGenres, sort]);
 
+  const selectedGenreNames = useMemo(
+    () =>
+      selectedGenres
+        .map((genreId) => genres.find((genre) => genre.id === genreId)?.name)
+        .filter((name): name is string => Boolean(name)),
+    [selectedGenres, genres],
+  );
+
+  const filterContextValue = useMemo(
+    () => ({
+      sort,
+      setSort,
+      release,
+      setRelease,
+      selectedGenres,
+      toggleGenre,
+      genres,
+      releaseFilters,
+      sortOptions,
+    }),
+    [sort, release, selectedGenres, toggleGenre, genres],
+  );
+
   const handleLoadMore = () => {
     if (!loadMore || !hasMore) return;
     startLoadMoreTransition(async () => {
@@ -156,147 +201,146 @@ export function FilterableMediaGallery({
   };
 
   return (
-    <section className="space-y-6" aria-label={`${title} filters`}>
-      <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
-        {description ? (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        ) : null}
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-        <aside className="space-y-8 rounded-3xl border border-border/60 bg-card/80 p-6 h-fit">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">Sort & Filter</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-xs text-muted-foreground underline-offset-4 hover:text-foreground"
-              onClick={clearFilters}
-            >
-              Reset
-            </Button>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Sort
-            </h4>
-            <div className="space-y-2">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setSort(option.value)}
-                  className={cn(
-                    "w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                    sort === option.value
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted/60 text-muted-foreground hover:bg-muted/80 hover:text-foreground",
-                  )}
-                  aria-pressed={sort === option.value}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-  <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Release Date
-            </h4>
-            <div className="space-y-2">
-              {releaseFilters.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setRelease(option.value)}
-                  className={cn(
-                    "w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                    release === option.value
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted/60 text-muted-foreground hover:bg-muted/80 hover:text-foreground",
-                  )}
-                  aria-pressed={release === option.value}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Genres
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {genres.map((genre) => {
-                const active = selectedGenres.includes(genre.id);
-                return (
-                  <button
-                    key={genre.id}
-                    type="button"
-                    onClick={() => toggleGenre(genre.id)}
-                    className={cn(
-                      "rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                      active
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/60 hover:text-foreground",
-                    )}
-                    aria-pressed={active}
-                  >
-                    {genre.name}
-                  </button>
-                );
-              })}
-            </div>
-            {genres.length === 0 ? (
-              <p className="text-xs text-muted-foreground">
-                Genres unavailable for this media type.
-              </p>
-            ) : null}
-          </div>
-        </aside>
-
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
-              Showing {filteredItems.length} of {allItems.length} titles
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Filters apply to {mediaType === "movie" ? "movies" : "TV shows"} sourced
-              from TMDB categories.
-            </p>
-          </div>
-          {filteredItems.length ? (
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredItems.map((item) => (
-                <MediaCard key={`${mediaType}-${item.id}`} {...item} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-border/60 bg-card/60 p-12 text-center">
-              <p className="text-sm font-semibold text-muted-foreground">
-                No titles match the selected filters.
-              </p>
-            </div>
-          )}
-          {loadMore && hasMore ? (
-            <div className="flex justify-center">
-              <Button
-                onClick={handleLoadMore}
-                disabled={isPending}
-                variant="ghost"
-                className="rounded-full border border-white/10 px-6"
-              >
-                {isPending ? "Loading…" : "Load more"}
-              </Button>
-            </div>
+    <FilterContext.Provider value={filterContextValue}>
+      <section className="space-y-6" aria-label={`${title} filters`}>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
+          {description ? (
+            <p className="text-sm text-muted-foreground">{description}</p>
           ) : null}
         </div>
-      </div>
-    </section>
+
+        <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
+          <div className="flex items-center justify-between gap-3 lg:hidden">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="rounded-full">
+                {filteredItems.length} results
+              </Badge>
+              {selectedGenreNames.length ? (
+                <Badge variant="outline" className="rounded-full">
+                  Genres: {selectedGenreNames.slice(0, 1).join(", ")}
+                  {selectedGenreNames.length > 1 ? (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      +{selectedGenreNames.length - 1} more
+                    </span>
+                  ) : null}
+                </Badge>
+              ) : null}
+              {release && release !== "all" ? (
+                <Badge variant="outline" className="rounded-full">
+                  Release: {releaseFilters.find((filter) => filter.value === release)?.label}
+                </Badge>
+              ) : null}
+              {sort !== "popularity" ? (
+                <Badge variant="outline" className="rounded-full">
+                  Sort: {sortOptions.find((option) => option.value === sort)?.label}
+                </Badge>
+              ) : null}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-2 rounded-full border border-white/20 bg-transparent px-3 py-2 text-sm font-medium text-foreground shadow-sm"
+              onClick={() => setFiltersOpen(true)}
+              aria-expanded={filtersOpen}
+              aria-controls="mobile-filters"
+            >
+              <FilterIcon className="h-4 w-4" aria-hidden="true" />
+              Filters
+            </Button>
+          </div>
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <SheetContent
+              side="right"
+              id="mobile-filters"
+              className="flex h-full max-w-sm flex-col gap-6 overflow-y-auto p-6 lg:hidden"
+            >
+              <SheetHeader>
+                <SheetTitle className="text-xl font-semibold text-foreground">
+                  Filters
+                </SheetTitle>
+                <SheetDescription className="text-sm text-muted-foreground">
+                  Adjust sorting, release periods, and genres to refine the catalogue.
+                </SheetDescription>
+              </SheetHeader>
+              <Separator className="bg-border/60" />
+              <FilterContent />
+              <div className="mt-auto flex flex-col gap-2">
+                <Button
+                  variant="default"
+                  className="rounded-full"
+                  onClick={() => setFiltersOpen(false)}
+                >
+                  Apply & Close
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="rounded-full text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    clearFilters();
+                    setFiltersOpen(false);
+                  }}
+                >
+                  Reset
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+          <aside className="hidden space-y-8 rounded-3xl border border-border/60 bg-card/80 p-6 lg:block h-fit">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Sort & Filter</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2 text-xs text-muted-foreground underline-offset-4 hover:text-foreground"
+                onClick={clearFilters}
+              >
+                Reset
+              </Button>
+            </div>
+
+            <FilterContent />
+          </aside>
+
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredItems.length} of {allItems.length} titles
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Filters apply to {mediaType === "movie" ? "movies" : "TV shows"} sourced
+                from TMDB categories.
+              </p>
+            </div>
+            {filteredItems.length ? (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {filteredItems.map((item) => (
+                  <MediaCard key={`${mediaType}-${item.id}`} {...item} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-border/60 bg-card/60 p-12 text-center">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  No titles match the selected filters.
+                </p>
+              </div>
+            )}
+            {loadMore && hasMore ? (
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={isPending}
+                  variant="ghost"
+                  className="rounded-full border border-white/10 px-6"
+                >
+                  {isPending ? "Loading…" : "Load more"}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    </FilterContext.Provider>
   );
 }
 
@@ -324,5 +368,127 @@ function compareItems(
     default:
       return (b.popularity ?? 0) - (a.popularity ?? 0);
   }
+}
+
+function FilterContent() {
+  const {
+    sort,
+    setSort,
+    release,
+    setRelease,
+    selectedGenres,
+    toggleGenre,
+    genres,
+    releaseFilters,
+    sortOptions,
+  } = useFilterContext();
+
+  return (
+    <>
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Sort
+        </h4>
+        <div className="space-y-2">
+          {sortOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setSort(option.value)}
+              className={cn(
+                "w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                sort === option.value
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+              )}
+              aria-pressed={sort === option.value}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Release Date
+        </h4>
+        <div className="space-y-2">
+          {releaseFilters.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setRelease(option.value)}
+              className={cn(
+                "w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                release === option.value
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+              )}
+              aria-pressed={release === option.value}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Genres
+        </h4>
+        <div className="grid grid-cols-2 gap-2">
+          {genres.map((genre) => {
+            const active = selectedGenres.includes(genre.id);
+            return (
+              <button
+                key={genre.id}
+                type="button"
+                onClick={() => toggleGenre(genre.id)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/60 hover:text-foreground",
+                )}
+                aria-pressed={active}
+              >
+                {genre.name}
+              </button>
+            );
+          })}
+        </div>
+        {genres.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Genres unavailable for this media type.
+          </p>
+        ) : null}
+      </div>
+    </>
+  );
+}
+
+function useFilterContext() {
+  const context = useInternalFilterContext();
+  if (!context) {
+    throw new Error("FilterContent must be used within FilterableMediaGallery");
+  }
+  return context;
+}
+
+const FilterContext = createContext<{
+  sort: SortOption;
+  setSort: Dispatch<SetStateAction<SortOption>>;
+  release: ReleaseOption;
+  setRelease: Dispatch<SetStateAction<ReleaseOption>>;
+  selectedGenres: number[];
+  toggleGenre: (genreId: number) => void;
+  genres: Genre[];
+  releaseFilters: typeof releaseFilters;
+  sortOptions: typeof sortOptions;
+} | null>(null);
+
+function useInternalFilterContext() {
+  return useContext(FilterContext);
 }
 

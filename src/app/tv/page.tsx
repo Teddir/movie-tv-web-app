@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Discover the latest, most popular, and top-rated television series sourced from TMDB.",
 };
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 
 type TvPageProps = {
   searchParams: Promise<{ category?: string | string[] }>;

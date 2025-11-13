@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Browse top rated, popular, upcoming, and now playing movies curated from TMDB.",
 };
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 
 type MoviesPageProps = {
   searchParams: Promise<{ category?: string | string[] }>;

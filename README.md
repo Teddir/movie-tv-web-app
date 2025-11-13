@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ElemesCinema
 
-## Getting Started
+A responsive Next.js 16 application that showcases top movies, TV shows, and people using data from the [The Movie Database (TMDB)](https://www.themoviedb.org/documentation/api). Built with Tailwind CSS v4 and shadcn/ui-inspired components.
 
-First, run the development server:
+## ✨ Features
+
+- Browse curated shelves for top-rated, now playing, popular, and upcoming **movies**
+- Explore popular, top-rated, airing today, and currently on-air **TV shows**
+- View **popular people** with quick access to their work
+- **Search** across movies, TV shows, and people with instant suggestions
+- Add titles to a persistent **watchlist** and record personal **ratings**
+- Responsive layout optimized for mobile, tablet, and desktop
+- Accessible, keyboard-friendly interactions with meaningful aria labels
+- Elegant loading skeletons and empty states for improved UX
+
+## 🛠️ Technology
+
+- [Next.js 16 (App Router)](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Tailwind CSS v4](https://tailwindcss.com/)
+- shadcn/ui-style component primitives
+- [Radix UI](https://www.radix-ui.com/) for accessible overlays
+- [Lucide Icons](https://lucide.dev/) for crisp SVG icons
+
+## 📦 Project Structure
+
+```
+src/
+  app/                # Next.js routes (app router)
+    movies/           # Movies index page + loading state
+    tv/               # TV index page + loading state
+    people/           # People index page + loading state
+    search/           # Search results page + loading state
+    layout.tsx        # Root layout with providers and global chrome
+    page.tsx          # Home page with curated shelves
+  components/
+    providers/        # Watchlist context provider
+    search/           # Search bar component
+    sections/         # Reusable section layouts (e.g., media shelf)
+    ui/               # shadcn-style primitives (button, card, etc.)
+    media-card.tsx    # Interactive card for movies + TV
+    person-card.tsx   # Card for talent/people
+    site-header.tsx   # App header with navigation and search
+    site-footer.tsx   # App footer and TMDB attribution
+    watchlist-drawer.tsx # Watchlist overlay
+  lib/
+    tmdb.ts           # Typed TMDB API client helpers
+    utils.ts          # UI helper utilities (class merging, formatters)
+```
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+
+- Node.js 18.18+ or 20+
+- npm 9+ (or pnpm/yarn/bun if preferred)
+- TMDB API credentials (either a v3 API key or v4 access token)
+
+### 2. Clone & Install
+
+```bash
+git clone https://github.com/your-org/movie-tv-web-app.git
+cd movie-tv-web-app
+npm install
+```
+
+### 3. Configure Environment
+
+Create a `.env.local` file in the project root and add your TMDB credentials. You can use either the v4 token or v3 API key—supplying both is fine.
+
+```bash
+# .env.local
+TMDB_ACCESS_TOKEN=your_tmdb_v4_read_token   # preferred
+# or
+TMDB_API_KEY=your_tmdb_v3_api_key
+```
+
+> 💡 Need credentials? Generate them from your TMDB account at https://www.themoviedb.org/settings/api.
+
+### 4. Run the App
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` in your browser. The app uses Next.js hot reloading for a smooth development experience.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## ✅ Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command         | Description                       |
+| --------------- | --------------------------------- |
+| `npm run dev`   | Start the local development server |
+| `npm run build` | Create a production build          |
+| `npm run start` | Serve the production build         |
+| `npm run lint`  | Run ESLint on the project          |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ♿ Accessibility Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Semantic HTML tags (`header`, `main`, `section`, `nav`, etc.) structure each page
+- All interactive elements are reachable via keyboard and include visible focus styles
+- Buttons and overlays include descriptive `aria-*` attributes
+- Color choices pass WCAG contrast guidelines for both light and dark preferences
 
-## Deploy on Vercel
+## 🔐 TMDB Guest Sessions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app uses TMDB guest sessions to persist watchlists and ratings without a full account login.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Provide a valid `TMDB_API_KEY` in `.env.local`
+- The app automatically provisions a guest session and stores it locally
+- Ratings are forwarded to TMDB with the guest session id; watchlist items are stored locally per session
+
+## 📄 TMDB Attribution
+
+This product uses the TMDB API but is not endorsed or certified by TMDB. Please ensure you comply with TMDB’s terms of use when deploying this application publicly.
+
+---
+
+Crafted with ❤️ to spotlight amazing stories across film and television. Enjoy building on top of ElemesCinema!

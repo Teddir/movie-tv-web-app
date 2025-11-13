@@ -124,11 +124,9 @@ export default async function HomePage() {
                   asChild
                 >
                   <Link
-                    href={`https://www.themoviedb.org/movie/${heroMovie.id}`}
-                    target="_blank"
-                    rel="noreferrer"
+                    href={`/movies/${heroMovie.id}`}
                   >
-                    View on TMDB
+                    View details
                   </Link>
                 </Button>
               ) : null}

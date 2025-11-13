@@ -64,6 +64,61 @@ export type MultiSearchResult =
   | (TvSummary & { media_type: "tv" })
   | (PersonSummary & { media_type: "person" });
 
+export interface PersonCombinedCredit {
+  id: number;
+  media_type: "movie" | "tv";
+  title?: string;
+  name?: string;
+  original_title?: string;
+  original_name?: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path?: string | null;
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  release_date?: string | null;
+  first_air_date?: string | null;
+  character?: string;
+  job?: string;
+  department?: string;
+}
+
+export interface PersonDetails {
+  id: number;
+  name: string;
+  known_for_department: string;
+  profile_path: string | null;
+  popularity: number;
+  gender: number;
+  adult: boolean;
+  biography: string;
+  birthday: string | null;
+  deathday: string | null;
+  place_of_birth: string | null;
+  also_known_as: string[];
+  homepage: string | null;
+  imdb_id: string | null;
+  combined_credits: {
+    cast: PersonCombinedCredit[];
+    crew: PersonCombinedCredit[];
+  };
+  external_ids?: {
+    imdb_id?: string | null;
+    twitter_id?: string | null;
+    instagram_id?: string | null;
+    facebook_id?: string | null;
+  };
+  images?: {
+    profiles: Array<{
+      file_path: string;
+      height: number;
+      width: number;
+      aspect_ratio: number;
+    }>;
+  };
+}
+
 export interface Genre {
   id: number;
   name: string;
@@ -295,6 +350,23 @@ export async function getTvDetails(id: string | number) {
         append_to_response: "videos,credits,recommendations",
       },
       revalidate: 600,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("404")) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function getPersonDetails(id: string | number) {
+  try {
+    return await tmdbFetch<PersonDetails>(`/person/${id}`, {
+      query: {
+        language: "en-US",
+        append_to_response: "combined_credits,external_ids,images",
+      },
+      revalidate: 900,
     });
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {

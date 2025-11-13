@@ -72,12 +72,10 @@ export function PersonCard({ person }: PersonCardProps) {
         ) : null}
         <div className="mt-auto">
           <Link
-            href={`https://www.themoviedb.org/person/${person.id}`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-medium text-primary hover:underline"
+            href={`/people/${person.id}`}
+            className="text-sm font-medium text-primary transition hover:underline"
           >
-            View full profile
+            View details
           </Link>
         </div>
       </CardContent>

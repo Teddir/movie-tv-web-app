@@ -145,6 +145,7 @@ export interface CastMember {
   character: string;
   profile_path: string | null;
   order: number;
+  credit_id: string;
 }
 
 export interface CrewMember {

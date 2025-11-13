@@ -213,40 +213,42 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
                 Familiar faces bringing {movie.title} to life.
               </p>
             </div>
-            <Link
-              href={`https://www.themoviedb.org/movie/${movie.id}/cast`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Full cast & crew
+            <Link href={`/movies/${movie.id}/credits`} className="text-sm font-medium text-primary hover:underline">
+              View all credits
             </Link>
           </div>
           <div className="scrollbar-thin flex gap-5 overflow-x-auto pb-2">
             {topCast.map((member) => (
               <article
                 key={member.id}
-                className="w-48 shrink-0 space-y-2 rounded-2xl border border-border/60 bg-card/70 p-4 text-center"
+                className="w-48 shrink-0 rounded-2xl border border-border/60 bg-card/70 p-1.5"
               >
-                <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-2xl border border-border/60 bg-muted">
-                  {member.profile_path ? (
-                    <Image
-                      src={getProfileUrl(member.profile_path, "w185") ?? ""}
-                      alt={member.name}
-                      fill
-                      sizes="144px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                      No image
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-foreground">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">{member.character}</p>
-                </div>
+                <Link
+                  href={`/people/${member.id}`}
+                  className="group flex h-full flex-col items-center gap-3 rounded-2xl p-2 text-center transition hover:bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
+                  <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-2xl border border-border/60 bg-muted">
+                    {member.profile_path ? (
+                      <Image
+                        src={getProfileUrl(member.profile_path, "w185") ?? ""}
+                        alt={member.name}
+                        fill
+                        sizes="144px"
+                        className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-foreground">{member.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {member.character || "Cast member"}
+                    </p>
+                  </div>
+                </Link>
               </article>
             ))}
           </div>

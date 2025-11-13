@@ -105,7 +105,7 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
       </div>
     );
   }
-  
+
   const show = await getTvDetails(id);
   if (!show) {
     notFound();
@@ -206,31 +206,29 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
         </div>
       </section>
 
-      {topCast.length ? (
-        <section className="space-y-4" aria-labelledby="series-cast-heading">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 id="series-cast-heading" className="text-2xl font-semibold text-foreground">
-                Main Cast
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                The talent driving {show.name}.
-              </p>
-            </div>
-            <Link
-              href={`https://www.themoviedb.org/tv/${show.id}/cast`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Full cast & crew
-            </Link>
+      <section className="space-y-4" aria-labelledby="top-cast-heading">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 id="top-cast-heading" className="text-2xl font-semibold text-foreground">
+              Top Billed Cast
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Familiar faces bringing {show.name} to life.
+            </p>
           </div>
-          <div className="scrollbar-thin flex gap-5 overflow-x-auto pb-2">
-            {topCast.map((member) => (
-              <article
-                key={member.id}
-                className="w-48 shrink-0 space-y-2 rounded-2xl border border-border/60 bg-card/70 p-4 text-center"
+          <Link href={`/tv/${show.id}/credits`} className="text-sm font-medium text-primary hover:underline">
+            View all credits
+          </Link>
+        </div>
+        <div className="scrollbar-thin flex gap-5 overflow-x-auto pb-2">
+          {topCast.map((member) => (
+            <article
+              key={member.id}
+              className="w-48 shrink-0 rounded-2xl border border-border/60 bg-card/70 p-1.5"
+            >
+              <Link
+                href={`/people/${member.id}`}
+                className="group flex h-full flex-col items-center gap-3 rounded-2xl p-2 text-center transition hover:bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
               >
                 <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-2xl border border-border/60 bg-muted">
                   {member.profile_path ? (
@@ -239,7 +237,7 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
                       alt={member.name}
                       fill
                       sizes="144px"
-                      className="object-cover"
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
@@ -249,13 +247,15 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-foreground">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">{member.character}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {member.character || "Cast member"}
+                  </p>
                 </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
 
       {show.seasons?.length ? (
         <section className="space-y-4" aria-labelledby="seasons-heading">

@@ -7,6 +7,7 @@ import {
   getBackdropUrl,
   getImageUrl,
   getProfileUrl,
+  getTvCategory,
   getTvDetails,
 } from "@/lib/tmdb";
 import { formatDate, formatRuntime, formatScore } from "@/lib/utils";
@@ -14,6 +15,8 @@ import { MediaInteractions } from "@/components/media-interactions";
 import { MediaShelf } from "@/components/sections/media-shelf";
 import { TrailerDialog } from "@/components/trailer-dialog";
 import { Badge } from "@/components/ui/badge";
+import { mapTvSummary } from "@/lib/mappers";
+import { TvCategorySection } from "@/app/tv/category-section";
 
 interface TvDetailPageProps {
   params: {
@@ -49,9 +52,60 @@ export async function generateMetadata({
     },
   };
 }
+const specialTvCategories = {
+  "airing-today": {
+    apiCategory: "airing_today",
+    title: "Airing Today",
+    description: "The latest TV shows airing today.",
+  },
+  "on-the-air": {
+    apiCategory: "on_the_air",
+    title: "On the Air",
+    description: "The latest TV shows on the air.",
+  },
+  "top-rated": {
+    apiCategory: "top_rated",
+    title: "Top Rated",
+    description: "The highest rated TV shows.",
+  },
+  popular: {
+    apiCategory: "popular",
+    title: "Popular",
+    description: "The most popular TV shows.",
+  },
+} as const;
 
+type SpecialTvCategoryKey = keyof typeof specialTvCategories;
+
+function isSpecialTvCategory(id: string): id is SpecialTvCategoryKey {
+  return id in specialTvCategories;
+}
 export default async function TvDetailPage({ params }: TvDetailPageProps) {
   const { id } = await params;
+
+  if (!id) {
+    return notFound();
+  }
+
+  if (isSpecialTvCategory(id)) {
+    const categoryConfig = specialTvCategories[id];
+    const categoryData = await getTvCategory(categoryConfig.apiCategory, 1);
+    const items = categoryData.results.map(mapTvSummary);
+    const hasMore = categoryData.page < categoryData.total_pages;
+
+    return (
+      <div className="space-y-16">
+        <TvCategorySection
+          title={categoryConfig.title}
+          description={categoryConfig.description}
+          initialItems={items}
+          category={id}
+          hasMore={hasMore}
+        />
+      </div>
+    );
+  }
+  
   const show = await getTvDetails(id);
   if (!show) {
     notFound();

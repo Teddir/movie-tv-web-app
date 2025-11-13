@@ -3,12 +3,15 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { MovieCategorySection } from "@/app/movies/category-section";
 import {
   getBackdropUrl,
   getImageUrl,
+  getMovieCategory,
   getMovieDetails,
   getProfileUrl,
 } from "@/lib/tmdb";
+import { mapMovieSummary } from "@/lib/mappers";
 import { formatDate, formatRuntime, formatScore } from "@/lib/utils";
 import { MediaInteractions } from "@/components/media-interactions";
 import { MediaShelf } from "@/components/sections/media-shelf";
@@ -50,11 +53,64 @@ export async function generateMetadata({
   };
 }
 
+const specialMovieCategories = {
+  "now-playing": {
+    apiCategory: "now_playing",
+    title: "Now Playing",
+    description: "The latest cinematic releases, curated from TMDB.",
+  },
+  popular: {
+    apiCategory: "popular",
+    title: "Popular Movies",
+    description: "Films audiences are buzzing about right now.",
+  },
+  "top-rated": {
+    apiCategory: "top_rated",
+    title: "Top Rated",
+    description: "Critically acclaimed favorites delivering unforgettable performances.",
+  },
+  upcoming: {
+    apiCategory: "upcoming",
+    title: "Upcoming Movies",
+    description: "Stay ahead with soon-to-be-released films.",
+  },
+} as const;
+
+type SpecialMovieCategoryKey = keyof typeof specialMovieCategories;
+
+function isSpecialMovieCategory(id: string): id is SpecialMovieCategoryKey {
+  return id in specialMovieCategories;
+}
+
 export default async function MovieDetailPage({ params }: MovieDetailPageProps) {
   const { id } = await params;
+
+  if (!id) {
+    return notFound();
+  }
+
+  if (isSpecialMovieCategory(id)) {
+    const categoryConfig = specialMovieCategories[id];
+    const categoryData = await getMovieCategory(categoryConfig.apiCategory, 1);
+    const items = categoryData.results.map(mapMovieSummary);
+    const hasMore = categoryData.page < categoryData.total_pages;
+
+    return (
+      <div className="space-y-16">
+        <MovieCategorySection
+          title={categoryConfig.title}
+          description={categoryConfig.description}
+          initialItems={items}
+          category={id}
+          hasMore={hasMore}
+        />
+      </div>
+    );
+  }
+
   const movie = await getMovieDetails(id);
   if (!movie) {
-    notFound();
+    return notFound();
   }
 
   const posterUrl = getImageUrl(movie.poster_path, "w500");

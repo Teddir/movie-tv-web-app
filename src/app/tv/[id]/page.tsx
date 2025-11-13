@@ -79,10 +79,10 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
             sizes="(max-width: 768px) 100vw, 90vw"
           />
         ) : null}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-black/85 via-black/70 to-black/85" />
+        <div className="absolute inset-0 -z-10 bg-linear-to-br from-black/85 via-black/70 to-black/85" />
         <div className="flex flex-col gap-10 p-8 md:flex-row md:gap-12 md:p-12">
           <div className="mx-auto w-48 shrink-0 md:mx-0 lg:w-60">
-            <div className="relative aspect-[2/3] overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
+            <div className="relative aspect-2/3 overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
               {posterUrl ? (
                 <Image
                   src={posterUrl}

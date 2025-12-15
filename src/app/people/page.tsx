@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 import { getPopularPeople } from "@/lib/tmdb";
 import { PersonCard } from "@/components/person-card";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 export const metadata: Metadata = {
   title: "People",
@@ -38,6 +39,7 @@ export default async function PeoplePage() {
           for, and jump directly to TMDB to dive deeper.
         </p>
       </header>
+      <AdWrapper adSlot="people-list-1" className="my-4" />
       <section
         aria-label="Popular people"
         className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"

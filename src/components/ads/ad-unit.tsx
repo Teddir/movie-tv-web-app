@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 interface AdUnitProps {
   adSlot: string;
+  publisherId: string;
   adFormat?: "auto" | "rectangle" | "vertical" | "horizontal";
   fullWidthResponsive?: boolean;
   className?: string;
@@ -12,16 +13,12 @@ interface AdUnitProps {
 
 export function AdUnit({
   adSlot,
+  publisherId,
   adFormat = "auto",
   fullWidthResponsive = true,
   className = "",
   style,
 }: AdUnitProps) {
-  const publisherId =
-    typeof window !== "undefined"
-      ? process.env.GOOGLE_ADSENSE_PUBLISHER_ID
-      : null;
-
   useEffect(() => {
     try {
       if (typeof window !== "undefined" && (window as any).adsbygoogle) {

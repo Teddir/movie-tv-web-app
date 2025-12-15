@@ -4,6 +4,7 @@ import { FilterableMediaGallery } from "@/components/filters/filterable-media-ga
 import { loadMoreCatalogueTv } from "@/app/tv/actions";
 import { getTvCategory, getTvGenres } from "@/lib/tmdb";
 import { mapTvSummary } from "@/lib/mappers";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 export const metadata: Metadata = {
   title: "TV Shows",
@@ -50,6 +51,8 @@ export default async function TvPage() {
           season-over-season.
         </p>
       </header>
+
+      <AdWrapper adSlot="tv-list-1" className="my-4" />
 
       <FilterableMediaGallery
         title="Browse Catalogue"

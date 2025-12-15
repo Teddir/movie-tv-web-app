@@ -13,6 +13,7 @@ import { formatDate, formatScore } from "@/lib/utils";
 import { MediaShelf } from "@/components/sections/media-shelf";
 import { PersonCard } from "@/components/person-card";
 import { Button } from "@/components/ui/button";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -163,6 +164,8 @@ export default async function HomePage() {
         items={mapMovies(nowPlayingMovies)}
       />
 
+      <AdWrapper adSlot="home-1" className="my-4" />
+
       <MediaShelf
         title="Top Rated Movies"
         subtitle="Critically acclaimed stories worth your time"
@@ -176,6 +179,8 @@ export default async function HomePage() {
         ctaHref="/tv"
         items={mapTv(popularTvShows)}
       />
+
+      <AdWrapper adSlot="home-2" className="my-4" />
 
       <MediaShelf
         title="Top Rated TV"

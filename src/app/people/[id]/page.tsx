@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MediaShelf } from "@/components/sections/media-shelf";
 import { PersonStructuredData } from "@/components/seo/structured-data";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 interface PersonDetailPageProps {
   params: {
@@ -263,6 +264,8 @@ export default async function PersonDetailPage({
           ) : null}
         </aside>
       </section>
+
+      <AdWrapper adSlot="person-detail-1" className="my-8" />
 
       {knownForItems.length ? (
         <MediaShelf

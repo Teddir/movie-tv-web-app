@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { mapTvSummary } from "@/lib/mappers";
 import { TvCategorySection } from "@/app/tv/category-section";
 import { TvStructuredData } from "@/components/seo/structured-data";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 interface TvDetailPageProps {
   params: {
@@ -345,6 +346,8 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
           </div>
         </section>
       ) : null}
+
+      <AdWrapper adSlot="tv-detail-1" className="my-8" />
 
       {recommendations.length ? (
         <MediaShelf

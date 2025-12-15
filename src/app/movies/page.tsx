@@ -4,6 +4,7 @@ import { loadMoreCatalogueMovies } from "@/app/movies/actions";
 import { FilterableMediaGallery } from "@/components/filters/filterable-media-gallery";
 import { getMovieCategory, getMovieGenres } from "@/lib/tmdb";
 import { mapMovieSummary } from "@/lib/mappers";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 export const metadata: Metadata = {
   title: "Movies",
@@ -53,6 +54,8 @@ export default async function MoviesPage() {
           award-winning, or arriving soon—and add favorites to your watchlist.
         </p>
       </header>
+
+      <AdWrapper adSlot="movies-list-1" className="my-4" />
 
       <FilterableMediaGallery
         title="Browse Catalogue"

@@ -18,6 +18,7 @@ import { MediaShelf } from "@/components/sections/media-shelf";
 import { TrailerDialog } from "@/components/trailer-dialog";
 import { Badge } from "@/components/ui/badge";
 import { MovieStructuredData } from "@/components/seo/structured-data";
+import { AdWrapper } from "@/components/ads/ad-wrapper";
 
 interface MovieDetailPageProps {
   params: {
@@ -299,6 +300,8 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
           </div>
         </section>
       ) : null}
+
+      <AdWrapper adSlot="movie-detail-1" className="my-8" />
 
       {recommendations.length ? (
         <MediaShelf

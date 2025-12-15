@@ -17,6 +17,7 @@ import { formatDate, formatScore } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MediaShelf } from "@/components/sections/media-shelf";
+import { PersonStructuredData } from "@/components/seo/structured-data";
 
 interface PersonDetailPageProps {
   params: {
@@ -36,25 +37,50 @@ export async function generateMetadata({
     };
   }
 
+  const baseUrl = "https://elemescinema.vercel.app";
+  const personUrl = `${baseUrl}/people/${id}`;
   const title = `${person.name} — ${person.known_for_department}`;
   const description = person.biography
     ? person.biography.slice(0, 160)
-    : `${person.name} details, credits, and biography.`;
+    : `${person.name} - ${person.known_for_department} profile, filmography, and biography on ElemesCinema`;
+  const profileImage = getProfileUrl(person.profile_path, "w780");
 
   return {
     title,
     description,
+    keywords: [
+      person.name,
+      person.known_for_department || "",
+      "actor",
+      "director",
+      "entertainment",
+      "filmography",
+    ],
     openGraph: {
       title,
       description,
-      images: person.profile_path
-        ? [getProfileUrl(person.profile_path, "w780") ?? ""]
+      type: "profile",
+      url: personUrl,
+      siteName: "ElemesCinema",
+      images: profileImage
+        ? [
+            {
+              url: profileImage,
+              width: 780,
+              height: 1170,
+              alt: `${person.name} profile`,
+            },
+          ]
         : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: profileImage ? [profileImage] : undefined,
+    },
+    alternates: {
+      canonical: personUrl,
     },
   };
 }
@@ -100,9 +126,13 @@ export default async function PersonDetailPage({
   const crewItems = crewHighlights.map(mapCreditToShelfItem);
 
   const externalLinks = buildExternalLinks(person.external_ids, person.homepage);
+  const baseUrl = "https://elemescinema.vercel.app";
+  const personUrl = `${baseUrl}/people/${person.id}`;
 
   return (
-    <div className="space-y-16">
+    <>
+      <PersonStructuredData person={person} url={personUrl} />
+      <div className="space-y-16">
       <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
         <div className="flex flex-col gap-10 p-8 md:flex-row md:gap-12 md:p-12">
           <div className="mx-auto w-52 shrink-0 md:mx-0 lg:w-64">
@@ -257,7 +287,8 @@ export default async function PersonDetailPage({
           items={crewItems}
         />
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }
 

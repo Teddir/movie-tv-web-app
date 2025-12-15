@@ -8,7 +8,20 @@ import { mapMovieSummary } from "@/lib/mappers";
 export const metadata: Metadata = {
   title: "Movies",
   description:
-    "Browse top rated, popular, and upcoming films curated from TMDB.",
+    "Browse top rated, popular, and upcoming films curated from TMDB. Discover the best movies, filter by genre, and add favorites to your watchlist.",
+  keywords: [
+    "movies",
+    "films",
+    "cinema",
+    "movie database",
+    "popular movies",
+    "top rated movies",
+    "upcoming movies",
+    "movie ratings",
+  ],
+  alternates: {
+    canonical: "https://elemescinema.vercel.app/movies",
+  },
 };
 
 export const dynamic = "force-dynamic";

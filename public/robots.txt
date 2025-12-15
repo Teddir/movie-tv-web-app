@@ -1,0 +1,22 @@
+# Allow all search engines
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /search?*
+
+# Allow Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+
+# Allow Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://elemescinema.vercel.app/sitemap.xml
+

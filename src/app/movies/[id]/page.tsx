@@ -17,6 +17,7 @@ import { MediaInteractions } from "@/components/media-interactions";
 import { MediaShelf } from "@/components/sections/media-shelf";
 import { TrailerDialog } from "@/components/trailer-dialog";
 import { Badge } from "@/components/ui/badge";
+import { MovieStructuredData } from "@/components/seo/structured-data";
 
 interface MovieDetailPageProps {
   params: {
@@ -35,20 +36,59 @@ export async function generateMetadata({
     };
   }
 
+  const baseUrl = "https://elemescinema.vercel.app";
+  const movieUrl = `${baseUrl}/movies/${id}`;
+  const posterUrl = getImageUrl(movie.poster_path, "w500");
+  const backdropUrl = getBackdropUrl(movie.backdrop_path, "original");
+
   return {
     title: movie.title,
-    description: movie.overview,
+    description: movie.overview || `${movie.title} - Movie details, cast, and ratings on ElemesCinema`,
+    keywords: [
+      movie.title,
+      ...(movie.genres?.map((g) => g.name) || []),
+      "movie",
+      "film",
+      "cinema",
+      "entertainment",
+    ],
     openGraph: {
       title: movie.title,
-      description: movie.overview,
-      images: movie.backdrop_path
-        ? [getBackdropUrl(movie.backdrop_path, "w780") ?? ""]
-        : undefined,
+      description: movie.overview || `${movie.title} - Movie details and information`,
+      type: "video.movie",
+      url: movieUrl,
+      siteName: "ElemesCinema",
+      images: backdropUrl
+        ? [
+            {
+              url: backdropUrl,
+              width: 1280,
+              height: 720,
+              alt: `${movie.title} backdrop`,
+            },
+          ]
+        : posterUrl
+          ? [
+              {
+                url: posterUrl,
+                width: 500,
+                height: 750,
+                alt: `${movie.title} poster`,
+              },
+            ]
+          : undefined,
+      ...(movie.release_date && {
+        releaseDate: movie.release_date,
+      }),
     },
     twitter: {
       card: "summary_large_image",
       title: movie.title,
-      description: movie.overview,
+      description: movie.overview || `${movie.title} - Movie details and information`,
+      images: backdropUrl ? [backdropUrl] : posterUrl ? [posterUrl] : undefined,
+    },
+    alternates: {
+      canonical: movieUrl,
     },
   };
 }
@@ -121,9 +161,14 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
   const topCast = movie.credits?.cast?.slice(0, 8) ?? [];
   const recommendations = movie.recommendations?.results?.slice(0, 12) ?? [];
 
+  const baseUrl = "https://elemescinema.vercel.app";
+  const movieUrl = `${baseUrl}/movies/${movie.id}`;
+
   return (
-    <div className="space-y-16">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
+    <>
+      <MovieStructuredData movie={movie} url={movieUrl} />
+      <div className="space-y-16">
+        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
         {backdropUrl ? (
           <Image
             src={backdropUrl}
@@ -271,7 +316,8 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
           }))}
         />
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }
 

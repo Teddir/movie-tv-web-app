@@ -16,7 +16,15 @@ interface SearchPageProps {
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search movies, TV shows, and people by keyword.",
+  description:
+    "Search movies, TV shows, and people by keyword. Find your favorite titles, actors, and directors on ElemesCinema.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://elemescinema.vercel.app/search",
+  },
 };
 
 export const dynamic = "force-dynamic";

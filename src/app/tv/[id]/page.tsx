@@ -17,6 +17,7 @@ import { TrailerDialog } from "@/components/trailer-dialog";
 import { Badge } from "@/components/ui/badge";
 import { mapTvSummary } from "@/lib/mappers";
 import { TvCategorySection } from "@/app/tv/category-section";
+import { TvStructuredData } from "@/components/seo/structured-data";
 
 interface TvDetailPageProps {
   params: {
@@ -35,20 +36,59 @@ export async function generateMetadata({
     };
   }
 
+  const baseUrl = "https://elemescinema.vercel.app";
+  const showUrl = `${baseUrl}/tv/${id}`;
+  const posterUrl = getImageUrl(show.poster_path, "w500");
+  const backdropUrl = getBackdropUrl(show.backdrop_path, "original");
+
   return {
     title: show.name,
-    description: show.overview,
+    description: show.overview || `${show.name} - TV series details, cast, and ratings on ElemesCinema`,
+    keywords: [
+      show.name,
+      ...(show.genres?.map((g) => g.name) || []),
+      "TV show",
+      "television",
+      "series",
+      "entertainment",
+    ],
     openGraph: {
       title: show.name,
-      description: show.overview,
-      images: show.backdrop_path
-        ? [getBackdropUrl(show.backdrop_path, "w780") ?? ""]
-        : undefined,
+      description: show.overview || `${show.name} - TV series details and information`,
+      type: "video.tv_show",
+      url: showUrl,
+      siteName: "ElemesCinema",
+      images: backdropUrl
+        ? [
+            {
+              url: backdropUrl,
+              width: 1280,
+              height: 720,
+              alt: `${show.name} backdrop`,
+            },
+          ]
+        : posterUrl
+          ? [
+              {
+                url: posterUrl,
+                width: 500,
+                height: 750,
+                alt: `${show.name} poster`,
+              },
+            ]
+          : undefined,
+      ...(show.first_air_date && {
+        releaseDate: show.first_air_date,
+      }),
     },
     twitter: {
       card: "summary_large_image",
       title: show.name,
-      description: show.overview,
+      description: show.overview || `${show.name} - TV series details and information`,
+      images: backdropUrl ? [backdropUrl] : posterUrl ? [posterUrl] : undefined,
+    },
+    alternates: {
+      canonical: showUrl,
     },
   };
 }
@@ -120,9 +160,14 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
   const topCast = show.credits?.cast?.slice(0, 8) ?? [];
   const recommendations = show.recommendations?.results?.slice(0, 12) ?? [];
 
+  const baseUrl = "https://elemescinema.vercel.app";
+  const showUrl = `${baseUrl}/tv/${show.id}`;
+
   return (
-    <div className="space-y-16">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
+    <>
+      <TvStructuredData show={show} url={showUrl} />
+      <div className="space-y-16">
+        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 shadow-2xl">
         {backdropUrl ? (
           <Image
             src={backdropUrl}
@@ -318,7 +363,8 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
           }))}
         />
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }
 

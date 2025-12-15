@@ -8,7 +8,20 @@ import { mapTvSummary } from "@/lib/mappers";
 export const metadata: Metadata = {
   title: "TV Shows",
   description:
-    "Browse popular and top rated series curated from TMDB.",
+    "Browse popular, top-rated, and currently airing TV series curated from TMDB. Discover the best television shows, filter by genre, and add favorites to your watchlist.",
+  keywords: [
+    "TV shows",
+    "television",
+    "series",
+    "TV series",
+    "popular TV shows",
+    "top rated TV shows",
+    "TV ratings",
+    "television database",
+  ],
+  alternates: {
+    canonical: "https://elemescinema.vercel.app/tv",
+  },
 };
 
 export const dynamic = "force-dynamic";

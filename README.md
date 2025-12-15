@@ -73,9 +73,14 @@ Create a `.env.local` file in the project root and add your TMDB credentials. Yo
 TMDB_ACCESS_TOKEN=your_tmdb_v4_read_token   # preferred
 # or
 TMDB_API_KEY=your_tmdb_v3_api_key
+
+# Google Search Console verification (optional)
+GOOGLE_SITE_VERIFICATION=your_google_verification_code
 ```
 
 > 💡 Need credentials? Generate them from your TMDB account at https://www.themoviedb.org/settings/api.
+> 
+> 🔍 **Google Search Console**: To verify your site with Google Search Console, add the `GOOGLE_SITE_VERIFICATION` environment variable with the verification code provided by Google. The verification meta tag will be automatically added to your site's head section.
 
 ### 4. Run the App
 

@@ -6,7 +6,19 @@ import { PersonCard } from "@/components/person-card";
 export const metadata: Metadata = {
   title: "People",
   description:
-    "Explore popular actors, directors, and creators shaping movies and television on TMDB.",
+    "Explore popular actors, directors, and creators shaping movies and television on TMDB. Browse celebrity profiles, filmography, and biographies.",
+  keywords: [
+    "actors",
+    "directors",
+    "celebrities",
+    "entertainment industry",
+    "filmography",
+    "movie stars",
+    "TV stars",
+  ],
+  alternates: {
+    canonical: "https://elemescinema.vercel.app/people",
+  },
 };
 
 export const revalidate = 900;

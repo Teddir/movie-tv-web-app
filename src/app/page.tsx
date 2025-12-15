@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 
 import {
   getBackdropUrl,
@@ -12,6 +13,15 @@ import { formatDate, formatScore } from "@/lib/utils";
 import { MediaShelf } from "@/components/sections/media-shelf";
 import { PersonCard } from "@/components/person-card";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Discover top-rated, trending, and upcoming movies, TV shows, and people. Browse popular films, TV series, and explore actor profiles. Your ultimate entertainment discovery platform.",
+  alternates: {
+    canonical: "https://elemescinema.vercel.app",
+  },
+};
 
 export const revalidate = 900;
 

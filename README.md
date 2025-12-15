@@ -76,11 +76,16 @@ TMDB_API_KEY=your_tmdb_v3_api_key
 
 # Google Search Console verification (optional)
 GOOGLE_SITE_VERIFICATION=your_google_verification_code
+
+# Google AdSense (optional)
+GOOGLE_ADSENSE_PUBLISHER_ID=ca-pub-XXXXXXXXXXXXXXXX
 ```
 
 > 💡 Need credentials? Generate them from your TMDB account at https://www.themoviedb.org/settings/api.
 > 
 > 🔍 **Google Search Console**: To verify your site with Google Search Console, add the `GOOGLE_SITE_VERIFICATION` environment variable with the verification code provided by Google. The verification meta tag will be automatically added to your site's head section.
+> 
+> 📢 **Google AdSense**: To enable ads on your site, add the `GOOGLE_ADSENSE_PUBLISHER_ID` environment variable with your AdSense publisher ID (format: `ca-pub-XXXXXXXXXXXXXXXX`). Once configured, you can use the `<AdUnit>` component to display ads throughout your site.
 
 ### 4. Run the App
 
@@ -121,9 +126,27 @@ The app uses TMDB guest sessions to persist watchlists and ratings without a ful
 - The app automatically provisions a guest session and stores it locally
 - Ratings are forwarded to TMDB with the guest session id; watchlist items are stored locally per session
 
+## 📢 Google AdSense Integration
+
+The app includes built-in support for Google AdSense. To use ads:
+
+1. **Get your AdSense Publisher ID** from [Google AdSense](https://www.google.com/adsense/)
+2. **Add the environment variable** to your `.env.local`:
+   ```bash
+   GOOGLE_ADSENSE_PUBLISHER_ID=ca-pub-XXXXXXXXXXXXXXXX
+   ```
+3. **Use the AdUnit component** in your pages:
+   ```tsx
+   import { AdUnit } from "@/components/ads/ad-unit";
+   
+   <AdUnit adSlot="1234567890" adFormat="auto" />
+   ```
+
+The AdSense script will automatically load when the publisher ID is configured. Ad units are responsive and will adapt to different screen sizes.
+
 ## 📄 TMDB Attribution
 
-This product uses the TMDB API but is not endorsed or certified by TMDB. Please ensure you comply with TMDB’s terms of use when deploying this application publicly.
+This product uses the TMDB API but is not endorsed or certified by TMDB. Please ensure you comply with TMDB's terms of use when deploying this application publicly.
 
 ---
 

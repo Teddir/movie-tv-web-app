@@ -7,7 +7,7 @@ import { RootProvider } from "@/components/providers/root-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WebsiteStructuredData } from "@/components/seo/structured-data";
-import { GoogleAdSense } from "@/components/ads/google-adsense";
+import { AdSenseScript } from "@/components/ads/adsense-script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     canonical: "https://elemescinema.vercel.app",
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    google: process.env.GOOGLE_SITE_VERIFICATION,
   },
   category: "entertainment",
 };
@@ -97,16 +97,12 @@ export default function RootLayout({
 }>) {
   const baseUrl = "https://elemescinema.vercel.app";
 
-  const adsensePublisherId = process.env.GOOGLE_ADSENSE_PUBLISHER_ID;
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
       >
-        {adsensePublisherId && (
-          <GoogleAdSense publisherId={adsensePublisherId} />
-        )}
+        <AdSenseScript />
         <WebsiteStructuredData
           url={baseUrl}
           name="ElemesCinema"

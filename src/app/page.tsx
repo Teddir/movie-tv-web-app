@@ -164,7 +164,7 @@ export default async function HomePage() {
         items={mapMovies(nowPlayingMovies)}
       />
 
-      <AdWrapper adSlot="home-1" className="my-4" />
+      <AdWrapper adSlot="8878212428" className="my-4" />
 
       <MediaShelf
         title="Top Rated Movies"
@@ -180,7 +180,7 @@ export default async function HomePage() {
         items={mapTv(popularTvShows)}
       />
 
-      <AdWrapper adSlot="home-2" className="my-4" />
+      <AdWrapper adSlot="4558681701" className="my-4" />
 
       <MediaShelf
         title="Top Rated TV"

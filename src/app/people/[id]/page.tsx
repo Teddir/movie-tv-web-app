@@ -265,7 +265,7 @@ export default async function PersonDetailPage({
         </aside>
       </section>
 
-      <AdWrapper adSlot="person-detail-1" className="my-8" />
+      <AdWrapper adSlot="4540152790" className="my-8" />
 
       {knownForItems.length ? (
         <MediaShelf

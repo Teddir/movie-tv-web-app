@@ -347,7 +347,7 @@ export default async function TvDetailPage({ params }: TvDetailPageProps) {
         </section>
       ) : null}
 
-      <AdWrapper adSlot="tv-detail-1" className="my-8" />
+      <AdWrapper adSlot="3245600038" className="my-8" />
 
       {recommendations.length ? (
         <MediaShelf

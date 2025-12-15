@@ -52,7 +52,7 @@ export default async function TvPage() {
         </p>
       </header>
 
-      <AdWrapper adSlot="tv-list-1" className="my-4" />
+      <AdWrapper adSlot="7840462924" className="my-4" />
 
       <FilterableMediaGallery
         title="Browse Catalogue"

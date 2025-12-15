@@ -55,7 +55,7 @@ export default async function MoviesPage() {
         </p>
       </header>
 
-      <AdWrapper adSlot="movies-list-1" className="my-4" />
+      <AdWrapper adSlot="4092789608" className="my-4" />
 
       <FilterableMediaGallery
         title="Browse Catalogue"

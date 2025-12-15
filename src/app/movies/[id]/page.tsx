@@ -301,7 +301,7 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
         </section>
       ) : null}
 
-      <AdWrapper adSlot="movie-detail-1" className="my-8" />
+      <AdWrapper adSlot="7979870205" className="my-8" />
 
       {recommendations.length ? (
         <MediaShelf
